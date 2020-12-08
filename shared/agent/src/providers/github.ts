@@ -2576,6 +2576,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 					  requestedReviewer {
 						... on User {
 						  id
+						  avatarUrl
 						  login
 						}
 					  }
@@ -2602,6 +2603,42 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 			`mutation RequestReviews($pullRequestId:ID!, $userIds:[ID!]!) {
 				requestReviews(input: {pullRequestId:$pullRequestId, userIds:$userIds}) {
 			  clientMutationId
+			  pullRequest {
+				updatedAt
+				reviewRequests(last: 10) {
+				  nodes {
+					requestedReviewer {
+					  ... on User {
+						id
+						avatarUrl
+						login
+						email
+					  }
+					}
+				  }
+				}
+				timelineItems(last: 1, itemTypes: REVIEW_REQUESTED_EVENT) {
+				  nodes {
+					... on ReviewRequestedEvent {
+					  __typename
+					  id
+					  actor {
+						login
+						avatarUrl
+					  }
+					  createdAt
+					  requestedReviewer {
+						... on User {
+						  id
+						  avatarUrl
+						  login
+						  avatarUrl
+						}
+					  }
+					}
+				  }
+				}
+			  }
 			}
 		  }`,
 			{
@@ -2609,7 +2646,22 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 				userIds: (currentReviewers || []).concat(request.userId)
 			}
 		);
-		return response;
+		return {
+			directives: [
+				{
+					type: "updatePullRequest",
+					data: { updatedAt: response.requestReviews.pullRequest.updatedAt }
+				},
+				{
+					type: "updatePullRequestReviewers",
+					data: response.requestReviews.pullRequest.reviewRequests.nodes
+				},
+				{
+					type: "addNode",
+					data: response.requestReviews.pullRequest.timelineItems.nodes[0]
+				}
+			]
+		};
 	}
 
 	async removeReviewerFromPullRequest(request: { pullRequestId: string; userId: string }) {
@@ -2618,6 +2670,21 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 			`mutation RequestReviews($pullRequestId:ID!, $userIds:[ID!]!) {
 				requestReviews(input: {pullRequestId:$pullRequestId, userIds:$userIds}) {
 			  clientMutationId
+			  pullRequest {
+				updatedAt
+				reviewRequests(last: 10) {
+				  nodes {
+					requestedReviewer {
+					  ... on User {
+						id
+						avatarUrl
+						login
+						email
+					  }
+					}
+				  }
+				}
+			  }
 			}
 		  }`,
 			{
@@ -2625,7 +2692,18 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 				userIds: (currentReviewers || []).filter((_: string) => _ !== request.userId)
 			}
 		);
-		return response;
+		return {
+			directives: [
+				{
+					type: "updatePullRequest",
+					data: { updatedAt: response.requestReviews.pullRequest.updatedAt }
+				},
+				{
+					type: "updatePullRequestReviewers",
+					data: response.requestReviews.pullRequest.reviewRequests.nodes
+				}
+			]
+		};
 	}
 
 	async createPullRequestCommentAndClose(request: { pullRequestId: string; text: string }) {
