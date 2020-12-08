@@ -1460,6 +1460,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 						  nodes {
 							... on AssignedEvent {
 							  __typename
+							  id
 							  actor {
 								login
 								avatarUrl
@@ -1475,6 +1476,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 							}
 							... on UnassignedEvent {
 							  __typename
+							  id
 							  actor {
 								login
 								avatarUrl
@@ -1495,7 +1497,6 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 				}
 			  }`;
 
-		// TODO
 		const response = await this.mutate<any>(query, {
 			assignableId: request.pullRequestId,
 			assigneeIds: request.assigneeId
@@ -1503,16 +1504,12 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		return {
 			directives: [
 				{
-					type: "replace",
-					// source: "assignable.assigness",
-					target: "assignees.nodes",
-					data: response[method]?.assignable?.assignees.nodes
+					type: "updatePullRequest",
+					data: { assignees: response[method].assignable.assignees }
 				},
 				{
-					type: "add",
-					// source: "assignable.assigness",
-					target: "timelineItems.nodes",
-					data: response[method]?.assignable?.timelineItems?.nodes[0]
+					type: "addNode",
+					data: response[method].assignable.timelineItems.nodes[0]
 				}
 			]
 		};
@@ -3311,6 +3308,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 			//   }`,
 			`... on AssignedEvent {
 			__typename
+			id
 			actor {
 			  login
 			  avatarUrl
@@ -3762,6 +3760,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 			//   }`,
 			`... on UnassignedEvent {
 			__typename
+			id
 			actor {
 			  login
 			  avatarUrl
