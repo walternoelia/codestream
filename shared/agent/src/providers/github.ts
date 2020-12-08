@@ -1494,6 +1494,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 				}
 			  }`;
 
+		// TODO
 		const response = await this.mutate<any>(query, {
 			assignableId: request.pullRequestId,
 			assigneeIds: request.assigneeId
@@ -1517,6 +1518,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 	}
 
 	async setAssigneeOnIssue(request: { issueId: string; assigneeId: string; onOff: boolean }) {
+		// does not require return directives
 		const method = request.onOff ? "addAssigneesToAssignable" : "removeAssigneesFromAssignable";
 		const Method = request.onOff ? "AddAssigneesFromAssignable" : "RemoveAssigneesFromAssignable";
 		const query = `mutation ${Method}($assignableId: ID!,$assigneeIds:[ID!]!) {
@@ -2796,6 +2798,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 	}
 
 	async addComment(request: { subjectId: string; text: string }) {
+		// does not require return directives
 		const response = await this.mutate<any>(
 			`mutation AddComment($subjectId:ID!,$body:String!) {
 				addComment(input: {subjectId:$subjectId, body:$body}) {
