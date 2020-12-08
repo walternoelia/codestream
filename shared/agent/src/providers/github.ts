@@ -2284,8 +2284,20 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 					  description
 					  number
 					}
-					timelineItems(last: 1, itemTypes: MILESTONED_EVENT) {
+					timelineItems(last: 1, itemTypes: [MILESTONED_EVENT,DEMILESTONED_EVENT]) {
 					  nodes {
+						  ... on MilestonedEvent {
+							__typename
+							id
+							actor {
+								login
+								avatarUrl
+								resourcePath
+								url
+							}
+							createdAt
+							milestoneTitle
+						}
 						... on DemilestonedEvent {
 						  __typename
 						  id
@@ -3333,6 +3345,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 			//   }`,
 			`... on BaseRefForcePushedEvent {
 			__typename
+			id
 			actor {
 			  login
 			  avatarUrl
@@ -3369,6 +3382,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 			//   }`,
 			this._transform(`[... on ConvertToDraftEvent {
 				__typename
+				id
 				actor {
 				  login
 				  avatarUrl
@@ -3412,6 +3426,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 			//   }`,
 			`... on HeadRefDeletedEvent {
 			__typename
+			id
 			actor {
 			  login
 			  avatarUrl
@@ -3419,6 +3434,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		  }`,
 			`... on HeadRefForcePushedEvent {
 			__typename
+			id
 			actor {
 			  login
 			  avatarUrl
@@ -3467,6 +3483,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		}`,
 			`... on LabeledEvent {
 			__typename
+			id
 			label {
 			  name
 			  description
@@ -3480,6 +3497,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		  }`,
 			`... on LockedEvent {
 			__typename
+			id
 			actor {
 			  login
 			  avatarUrl
@@ -3489,9 +3507,11 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		  }`,
 			`... on MarkedAsDuplicateEvent {
 			__typename
+			id
 		  }`,
 			`... on MentionedEvent {
 			__typename
+			id
 			actor {
 			  login
 			  avatarUrl
@@ -3500,6 +3520,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		  }`,
 			`... on MergedEvent {
 			__typename
+			id
 			actor {
 			  login
 			  avatarUrl
@@ -3512,6 +3533,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		  }`,
 			`... on MilestonedEvent {
 			__typename
+			id
 			actor {
 			  login
 			  avatarUrl
@@ -3671,6 +3693,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 			//   }`,
 			`... on ReferencedEvent {
 			__typename
+			id
 			actor {
 			  login
 			  avatarUrl
@@ -3704,6 +3727,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 			//   }`,
 			`... on RenamedTitleEvent {
 			__typename
+			id
 			actor {
 			  login
 			  avatarUrl
@@ -3713,8 +3737,8 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 			createdAt
 		  }`,
 			`... on ReopenedEvent {
-			id
 			__typename
+			id
 			actor {
 			  login
 			  avatarUrl
@@ -3723,6 +3747,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		  }`,
 			`... on ReviewDismissedEvent {
 			__typename
+			id
 			actor {
 				login
 				avatarUrl
@@ -3739,6 +3764,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 			//   }`,
 			`... on ReviewRequestedEvent {
 			__typename
+			id
 			actor {
 			  login
 			  avatarUrl
@@ -3776,6 +3802,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		  }`,
 			`... on UnlabeledEvent {
 			__typename
+			id
 			label {
 			  color
 			  name
@@ -3789,6 +3816,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		  }`,
 			`... on UnlockedEvent {
 			__typename
+			id
 			actor {
 			  login
 			  avatarUrl
