@@ -66,6 +66,26 @@ interface GitHubRepo {
 	has_issues: boolean;
 }
 
+interface Directives {
+	directives: {
+		type:
+			| "addNode"
+			| "addNodes"
+			| "addReaction"
+			| "removeNode"
+			| "removeReaction"
+			| "resolveReviewThread"
+			| "unresolveReviewThread"
+			| "updateNode"
+			| "updatePullRequest"
+			| "updatePullRequestReview"
+			| "updatePullRequestReviewers"
+			| "updatePullRequestReviewComment"
+			| "updatePullRequestReviewCommentNode";
+		data: any;
+	}[];
+}
+
 const diffHunkRegex = /^@@ -([\d]+)(?:,([\d]+))? \+([\d]+)(?:,([\d]+))? @@/;
 
 @lspProvider("github")
@@ -1330,7 +1350,10 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		return query.repository.collaborators.nodes;
 	}
 
-	async markPullRequestReadyForReview(request: { pullRequestId: string; isReady: boolean }) {
+	async markPullRequestReadyForReview(request: {
+		pullRequestId: string;
+		isReady: boolean;
+	}): Promise<Directives | undefined> {
 		if (request.isReady) {
 			const query = `mutation MarkPullRequestReadyForReview($pullRequestId:ID!) {
 				markPullRequestReadyForReview(input: {pullRequestId: $pullRequestId}) {
@@ -1366,7 +1389,11 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		}
 	}
 
-	async setLabelOnPullRequest(request: { pullRequestId: string; labelId: string; onOff: boolean }) {
+	async setLabelOnPullRequest(request: {
+		pullRequestId: string;
+		labelId: string;
+		onOff: boolean;
+	}): Promise<Directives> {
 		const method = request.onOff ? "addLabelsToLabelable" : "removeLabelsFromLabelable";
 		const Method = request.onOff ? "AddLabelsToLabelable" : "RemoveLabelsFromLabelable";
 		const query = `mutation ${Method}($labelableId: ID!,$labelIds:[ID!]!) {
@@ -1438,7 +1465,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		pullRequestId: string;
 		assigneeId: string;
 		onOff: boolean;
-	}) {
+	}): Promise<Directives> {
 		const method = request.onOff ? "addAssigneesToAssignable" : "removeAssigneesFromAssignable";
 		const Method = request.onOff ? "AddAssigneesFromAssignable" : "RemoveAssigneesFromAssignable";
 		const query = `mutation ${Method}($assignableId:ID!, $assigneeIds:[ID!]!) {
@@ -1532,7 +1559,11 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		return response;
 	}
 
-	async toggleReaction(request: { subjectId: string; content: string; onOff: boolean }) {
+	async toggleReaction(request: {
+		subjectId: string;
+		content: string;
+		onOff: boolean;
+	}): Promise<Directives> {
 		const method = request.onOff ? "addReaction" : "removeReaction";
 		const Method = request.onOff ? "AddReaction" : "RemoveReaction";
 		const query = `mutation ${Method}($subjectId: ID!, $content:ReactionContent!) {
@@ -1592,7 +1623,10 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		};
 	}
 
-	async updatePullRequestSubscription(request: { pullRequestId: string; onOff: boolean }) {
+	async updatePullRequestSubscription(request: {
+		pullRequestId: string;
+		onOff: boolean;
+	}): Promise<Directives> {
 		const query = `mutation UpdateSubscription($subscribableId:ID!, $state:SubscriptionState!) {
 			updateSubscription(input: {subscribableId: $subscribableId, state:$state}) {
 				  clientMutationId
@@ -1616,7 +1650,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		};
 	}
 
-	async updateIssueComment(request: { id: string; body: string }) {
+	async updateIssueComment(request: { id: string; body: string }): Promise<Directives> {
 		const query = `mutation UpdateComment($id:ID!, $body:String!) {
 			updateIssueComment(input: {id: $id, body:$body}) {
 				clientMutationId
@@ -1645,7 +1679,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		};
 	}
 
-	async updateReviewComment(request: { id: string; body: string }) {
+	async updateReviewComment(request: { id: string; body: string }): Promise<Directives> {
 		const query = `mutation UpdateComment($pullRequestReviewCommentId: ID!, $body: String!) {
 			updatePullRequestReviewComment(input: {pullRequestReviewCommentId: $pullRequestReviewCommentId, body: $body}) {
 			  clientMutationId
@@ -1681,17 +1715,17 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		};
 	}
 
-	async updateReview(request: { id: string; body: string }) {
+	async updateReview(request: { id: string; body: string }): Promise<Directives> {
 		const query = `mutation UpdateComment($pullRequestReviewId:ID!, $body:String!) {
 			updatePullRequestReview(input: {pullRequestReviewId: $pullRequestReviewId, body:$body}) {
 				  clientMutationId
 				     pullRequestReview {
-      bodyText
-      bodyHTML
-      body
-      includesCreatedEdit
-      id
-    }
+						bodyText
+						bodyHTML
+						body
+						includesCreatedEdit
+						id
+					}
 				}
 			  }`;
 
@@ -1709,7 +1743,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		};
 	}
 
-	async updatePullRequestBody(request: { id: string; body: string }) {
+	async updatePullRequestBody(request: { id: string; body: string }): Promise<Directives> {
 		const query = `mutation UpdateComment($pullRequestId:ID!, $body:String!) {
 			updatePullRequest(input: {pullRequestId: $pullRequestId, body:$body}) {
 				  clientMutationId
@@ -1741,6 +1775,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 			};
 		};
 	}> {
+		// TODO add directives
 		const query = `
 		mutation AddPullRequestReview($pullRequestId:ID!) {
 		addPullRequestReview(input: {pullRequestId: $pullRequestId}) {
@@ -1908,6 +1943,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		// used with old servers
 		pullRequestReviewId?: string;
 	}) {
+		// TODO add directives
 		if (!request.eventType) {
 			request.eventType = "COMMENT";
 		}
@@ -2271,7 +2307,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		pullRequestId: string;
 		milestoneId: string;
 		onOff: boolean;
-	}) {
+	}): Promise<Directives> {
 		const query = `mutation UpdatePullRequest($pullRequestId:ID!, $milestoneId: ID) {
 			updatePullRequest(input: {pullRequestId: $pullRequestId, milestoneId: $milestoneId}) {
 				  clientMutationId
@@ -2336,7 +2372,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		pullRequestId: string;
 		projectId: string;
 		onOff: boolean;
-	}) {
+	}): Promise<Directives> {
 		const metadata = await this.getPullRequestMetadata(request.pullRequestId);
 		const projectIds = new Set(metadata.projectCards.map(_ => _.project.id));
 		const query = `mutation UpdatePullRequest($pullRequestId:ID!, $projectIds: [ID!]) {
@@ -2377,7 +2413,10 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		};
 	}
 
-	async updatePullRequestTitle(request: { pullRequestId: string; title: string }) {
+	async updatePullRequestTitle(request: {
+		pullRequestId: string;
+		title: string;
+	}): Promise<Directives> {
 		const query = `mutation UpdatePullRequest($pullRequestId:ID!, $title: String) {
 			updatePullRequest(input: {pullRequestId: $pullRequestId, title: $title}) {
 				  clientMutationId
@@ -2402,7 +2441,10 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		};
 	}
 
-	async mergePullRequest(request: { pullRequestId: string; mergeMethod: MergeMethod }) {
+	async mergePullRequest(request: {
+		pullRequestId: string;
+		mergeMethod: MergeMethod;
+	}): Promise<Directives> {
 		if (!request.mergeMethod) throw new Error("InvalidMergeMethod");
 		const mergeMethods = new Set(["MERGE", "REBASE", "SQUASH"]);
 		if (!mergeMethods.has(request.mergeMethod)) throw new Error("InvalidMergeMethod");
@@ -2498,7 +2540,10 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		};
 	}
 
-	async lockPullRequest(request: { pullRequestId: string; lockReason: string }) {
+	async lockPullRequest(request: {
+		pullRequestId: string;
+		lockReason: string;
+	}): Promise<Directives> {
 		// OFF_TOPIC, TOO_HEATED, SPAM
 		const response = await this.mutate<any>(
 			`mutation LockPullRequest($lockableId:ID!, $lockReason:LockReason) {
@@ -2528,7 +2573,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		};
 	}
 
-	async unlockPullRequest(request: { pullRequestId: string }) {
+	async unlockPullRequest(request: { pullRequestId: string }): Promise<Directives> {
 		const response = await this.mutate<any>(
 			`mutation UnlockPullRequest($pullRequestId:ID!) {
 				unlockLockable(input: {lockableId: $pullRequestId}) {
@@ -2597,7 +2642,10 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		);
 	}
 
-	async addReviewerToPullRequest(request: { pullRequestId: string; userId: string }) {
+	async addReviewerToPullRequest(request: {
+		pullRequestId: string;
+		userId: string;
+	}): Promise<Directives> {
 		const currentReviewers = await this.getReviewersForPullRequest(request);
 		const response = await this.mutate<any>(
 			`mutation RequestReviews($pullRequestId:ID!, $userIds:[ID!]!) {
@@ -2664,7 +2712,10 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		};
 	}
 
-	async removeReviewerFromPullRequest(request: { pullRequestId: string; userId: string }) {
+	async removeReviewerFromPullRequest(request: {
+		pullRequestId: string;
+		userId: string;
+	}): Promise<Directives> {
 		const currentReviewers = await this.getReviewersForPullRequest(request);
 		const response = await this.mutate<any>(
 			`mutation RequestReviews($pullRequestId:ID!, $userIds:[ID!]!) {
@@ -2706,7 +2757,10 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		};
 	}
 
-	async createPullRequestCommentAndClose(request: { pullRequestId: string; text: string }) {
+	async createPullRequestCommentAndClose(request: {
+		pullRequestId: string;
+		text: string;
+	}): Promise<Directives> {
 		const directives: any = [];
 		const response = { directives: directives };
 		if (request.text) {
@@ -2809,7 +2863,10 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		return response;
 	}
 
-	async createPullRequestCommentAndReopen(request: { pullRequestId: string; text: string }) {
+	async createPullRequestCommentAndReopen(request: {
+		pullRequestId: string;
+		text: string;
+	}): Promise<Directives> {
 		const directives: any = [];
 		const response = { directives: directives };
 		if (request.text) {
@@ -2911,7 +2968,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		return response;
 	}
 
-	async resolveReviewThread(request: { threadId: string }) {
+	async resolveReviewThread(request: { threadId: string }): Promise<Directives> {
 		const response = await this.mutate<any>(
 			`mutation ResolveReviewThread($threadId:ID!) {
 				resolveReviewThread(input: {threadId:$threadId}) {
@@ -2944,7 +3001,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		};
 	}
 
-	async unresolveReviewThread(request: { threadId: string }) {
+	async unresolveReviewThread(request: { threadId: string }): Promise<Directives> {
 		const response = await this.mutate<any>(
 			`mutation UnresolveReviewThread($threadId:ID!) {
 				unresolveReviewThread(input: {threadId:$threadId}) {
@@ -3079,7 +3136,10 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		return data.body;
 	}
 
-	async createPullRequestComment(request: { pullRequestId: string; text: string }) {
+	async createPullRequestComment(request: {
+		pullRequestId: string;
+		text: string;
+	}): Promise<Directives> {
 		// TODO move all that added code into a shared location
 		const query = `mutation AddCommentToPullRequest($subjectId:ID!, $body:String!) {
 				addComment(input: {subjectId: $subjectId, body:$body}) {
@@ -3125,8 +3185,12 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		});
 
 		return {
-			directives: "addNode",
-			data: response.addComment.timelineEdge.node
+			directives: [
+				{
+					type: "addNode",
+					data: response.addComment.timelineEdge.node
+				}
+			]
 		};
 	}
 
@@ -3170,7 +3234,7 @@ export class GitHubProvider extends ThirdPartyIssueProviderBase<CSGitHubProvider
 		id: string;
 		pullRequestId: string;
 		type: "ISSUE_COMMENT" | "REVIEW_COMMENT";
-	}) {
+	}): Promise<Directives | undefined> {
 		const method =
 			request.type === "ISSUE_COMMENT" ? "deleteIssueComment" : "deletePullRequestReviewComment";
 
