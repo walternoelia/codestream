@@ -8,10 +8,10 @@ export default {
 
     "signUp.password.help": "6+ characters",
 	"signUp.password.tip": "6+ characters",
-
-
-
-
+	"signUp.email.label": "Correo electrónico",
+	"signUp.email.invalid": "Ese parece ve invalido",
+	"signUp.email.help": "Lo tenemos de Git",
+	"signUp.email.tip": "Valor predeterminado de git",
     "signUp.fullName.label": "Nombre Completo",
     "signUp.companyName.label": "Nombre de la Compañía",
 	"signUp.submitButton": "Crear Cuenta",
