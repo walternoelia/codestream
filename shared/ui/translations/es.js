@@ -6,8 +6,8 @@ export default {
     "signUp.password.label": "Contraseña",
 
 
-
-
+    "signUp.password.help": "6+ characters",
+	"signUp.password.tip": "6+ characters",
 
 
 
