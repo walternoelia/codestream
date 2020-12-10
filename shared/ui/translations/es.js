@@ -12,5 +12,10 @@ export default {
 
 
 
-    "signUp.fullName.label": "Nombre Completo"
+    "signUp.fullName.label": "Nombre Completo",
+    "signUp.companyName.label": "Nombre de la Compañía",
+	"signUp.submitButton": "Crear Cuenta",
+	
+	"signUp.legal.terms": "Terminos",
+	"signUp.legal.privacyPolicy": "Política de Privacidad"
 }
