@@ -6,8 +6,8 @@ export default {
     "signUp.password.label": "Contraseña",
 
 
-    "signUp.password.help": "6+ characters",
-	"signUp.password.tip": "6+ characters",
+    "signUp.password.help": "6+ carácteres",
+	"signUp.password.tip": "6+ carácteres",
 	"signUp.email.label": "Correo electrónico",
 	"signUp.email.invalid": "Ese parece ve invalido",
 	"signUp.email.help": "Lo tenemos de Git",
