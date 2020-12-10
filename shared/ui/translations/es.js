@@ -1,7 +1,7 @@
 export default {
-	
-   
-   
+	and: "y",
+	learnMore: "Aprende más.",
+	"signUp.username.label": "Nombre de usuario",
     "signUp.username.help": "[A-Za-z0-9-_.] son válidos",
     "signUp.password.label": "Contraseña",
 
